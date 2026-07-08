@@ -45,6 +45,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(buildBody(HttpStatus.CONFLICT, ex.getMessage()));
     }
 
+    @ExceptionHandler(SaldoNaoZeradoException.class)
+    public ResponseEntity<Map<String, Object>> handleSaldoNaoZerado(SaldoNaoZeradoException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(buildBody(HttpStatus.CONFLICT, ex.getMessage()));
+    }
+
     private Map<String, Object> buildBody(HttpStatus status, String message) {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now());
