@@ -40,6 +40,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(buildBody(HttpStatus.UNAUTHORIZED, ex.getMessage()));
     }
 
+    @ExceptionHandler(ClienteComContaVinculadaException.class)
+    public ResponseEntity<Map<String, Object>> handleClienteComContaVinculada(ClienteComContaVinculadaException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(buildBody(HttpStatus.CONFLICT, ex.getMessage()));
+    }
+
     private Map<String, Object> buildBody(HttpStatus status, String message) {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now());

@@ -4,9 +4,11 @@ import com.aplication.bankapi.dto.cliente.ClienteRequest;
 import com.aplication.bankapi.dto.cliente.ClienteResponse;
 import com.aplication.bankapi.dto.cliente.ClienteUpdateRequest;
 import com.aplication.bankapi.entity.Cliente;
+import com.aplication.bankapi.exception.ClienteComContaVinculadaException;
 import com.aplication.bankapi.exception.EmailJaCadastradoException;
 import com.aplication.bankapi.exception.ResourceNotFoundException;
 import com.aplication.bankapi.repository.ClienteRepository;
+import com.aplication.bankapi.repository.ContaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,8 +21,10 @@ import java.util.List;
 @Transactional
 public class ClienteService {
 
+    private final ContaRepository contaRepository;
     private final ClienteRepository clienteRepository;
     private final PasswordEncoder passwordEncoder;
+
 
     public ClienteResponse criar(ClienteRequest request) {
         if (clienteRepository.existsByEmail(request.email())) {
@@ -65,6 +69,11 @@ public class ClienteService {
     }
 
     public void deletar(Long id) {
+
+        if(contaRepository.existsByClienteId(id)) {
+            throw new ClienteComContaVinculadaException(id);
+        }
+
         clienteRepository.delete(buscarEntidadePorId(id));
     }
 
