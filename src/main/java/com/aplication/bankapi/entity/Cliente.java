@@ -22,7 +22,6 @@ public class Cliente {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) 
-    @Column(name = "id")
     @EqualsAndHashCode.Include 
     private Long id;
 
