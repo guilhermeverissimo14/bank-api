@@ -1,4 +1,4 @@
-package com.aplication.bankapi.exeception;
+package com.aplication.bankapi.exception;
 
 public class ResourceNotFoundException extends RuntimeException {
     public ResourceNotFoundException(String message) {
