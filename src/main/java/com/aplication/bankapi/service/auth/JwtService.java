@@ -1,4 +1,4 @@
-package com.aplication.bankapi.service;
+package com.aplication.bankapi.service.auth;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
@@ -20,7 +20,7 @@ public class JwtService {
     private final long expirationMinutes;
 
     public JwtService(@Value("${jwt.secret}") String secret,
-                       @Value("${jwt.expiration-minutes}") long expirationMinutes) {
+            @Value("${jwt.expiration-minutes}") long expirationMinutes) {
         this.secretKey = secret.getBytes(StandardCharsets.UTF_8);
         this.expirationMinutes = expirationMinutes;
     }
@@ -44,4 +44,9 @@ public class JwtService {
             throw new IllegalStateException("Erro ao gerar token JWT", e);
         }
     }
+
+    public long getExpirationSeconds() {
+        return expirationMinutes * 60;
+    }
+
 }
