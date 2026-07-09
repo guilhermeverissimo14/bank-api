@@ -1,4 +1,4 @@
-package com.aplication.bankapi.exception;
+package com.aplication.bankapi.exception.handler;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -6,6 +6,14 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import com.aplication.bankapi.exception.ClienteComContaVinculadaException;
+import com.aplication.bankapi.exception.ContaInativaException;
+import com.aplication.bankapi.exception.CredenciaisInvalidasException;
+import com.aplication.bankapi.exception.EmailJaCadastradoException;
+import com.aplication.bankapi.exception.ResourceNotFoundException;
+import com.aplication.bankapi.exception.SaldoInsuficienteException;
+import com.aplication.bankapi.exception.SaldoNaoZeradoException;
 
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
@@ -47,6 +55,16 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(SaldoNaoZeradoException.class)
     public ResponseEntity<Map<String, Object>> handleSaldoNaoZerado(SaldoNaoZeradoException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(buildBody(HttpStatus.CONFLICT, ex.getMessage()));
+    }
+
+    @ExceptionHandler(SaldoInsuficienteException.class)
+    public ResponseEntity<Map<String, Object>> handleSaldoInsuficiente(SaldoInsuficienteException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(buildBody(HttpStatus.CONFLICT, ex.getMessage()));
+    }
+
+    @ExceptionHandler(ContaInativaException.class)
+    public ResponseEntity<Map<String, Object>> handleContaInativa(ContaInativaException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(buildBody(HttpStatus.CONFLICT, ex.getMessage()));
     }
 
