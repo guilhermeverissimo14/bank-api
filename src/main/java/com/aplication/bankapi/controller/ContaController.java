@@ -2,6 +2,9 @@ package com.aplication.bankapi.controller;
 
 import com.aplication.bankapi.dto.conta.AbrirContaRequest;
 import com.aplication.bankapi.dto.conta.ContaResponse;
+import com.aplication.bankapi.dto.conta.LancamentoResponse;
+import com.aplication.bankapi.dto.conta.SaldoResponse;
+import com.aplication.bankapi.dto.conta.ValorRequest;
 import com.aplication.bankapi.service.ContaService;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -41,5 +44,26 @@ public class ContaController {
     public ResponseEntity<ContaResponse> encerrar(@PathVariable Long id) {
         return ResponseEntity.ok(contaService.encerrar(id));
     }
-}
 
+    // Endpoints para depositar, sacar, consultar saldo e extrato
+    @PostMapping("/{id}/depositar")
+    public ResponseEntity<ContaResponse> depositar(@PathVariable Long id, @Valid @RequestBody ValorRequest request) {
+        return ResponseEntity.ok(contaService.depositar(id, request));
+    }
+
+    @PostMapping("/{id}/sacar")
+    public ResponseEntity<ContaResponse> sacar(@PathVariable Long id, @Valid @RequestBody ValorRequest request) {
+        return ResponseEntity.ok(contaService.sacar(id, request));
+    }
+
+    @GetMapping("/{id}/saldo")
+    public ResponseEntity<SaldoResponse> consultarSaldo(@PathVariable Long id) {
+        return ResponseEntity.ok(contaService.consultarSaldo(id));
+    }
+
+    @GetMapping("/{id}/extrato")
+    public ResponseEntity<List<LancamentoResponse>> extrato(@PathVariable Long id) {
+        return ResponseEntity.ok(contaService.extrato(id));
+    }
+
+}

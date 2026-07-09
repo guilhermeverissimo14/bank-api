@@ -8,13 +8,21 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.aplication.bankapi.dto.conta.AbrirContaRequest;
 import com.aplication.bankapi.dto.conta.ContaResponse;
+import com.aplication.bankapi.dto.conta.LancamentoResponse;
+import com.aplication.bankapi.dto.conta.SaldoResponse;
+import com.aplication.bankapi.dto.conta.ValorRequest;
 import com.aplication.bankapi.entity.Cliente;
 import com.aplication.bankapi.entity.Conta;
+import com.aplication.bankapi.entity.Lancamento;
 import com.aplication.bankapi.enums.StatusConta;
+import com.aplication.bankapi.enums.TipoLancamento;
+import com.aplication.bankapi.exception.ContaInativaException;
 import com.aplication.bankapi.exception.ResourceNotFoundException;
+import com.aplication.bankapi.exception.SaldoInsuficienteException;
 import com.aplication.bankapi.exception.SaldoNaoZeradoException;
 import com.aplication.bankapi.repository.ClienteRepository;
 import com.aplication.bankapi.repository.ContaRepository;
+import com.aplication.bankapi.repository.LancamentoRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,6 +34,7 @@ public class ContaService {
 
     private final ClienteRepository clienteRepository;
     private final ContaRepository contaRepository;
+    private final LancamentoRepository lancamentoRepository;
 
     public ContaResponse abrirConta(AbrirContaRequest request) {
         Cliente cliente = clienteRepository.findById(request.clienteId())
@@ -50,9 +59,66 @@ public class ContaService {
                 .toList();
     }
 
-    @Transactional(readOnly = true) 
+    @Transactional(readOnly = true)
     public ContaResponse buscarPorId(Long id) {
         return toResponse(buscarEntidadePorId(id));
+    }
+
+    public ContaResponse depositar(Long id, ValorRequest request) {
+        Conta conta = buscarEntidadePorId(id);
+        validarContaAtiva(conta);
+
+        conta.setSaldo(conta.getSaldo().add(request.valor()));
+        registrarLancamento(conta, TipoLancamento.DEPOSITO, request.valor());
+
+        return toResponse(conta);
+    }
+
+    public ContaResponse sacar(Long id, ValorRequest request) {
+        Conta conta = buscarEntidadePorId(id);
+        validarContaAtiva(conta);
+
+        if (conta.getSaldo().compareTo(request.valor()) < 0) {
+            throw new SaldoInsuficienteException(id, conta.getSaldo());
+        }
+
+        conta.setSaldo(conta.getSaldo().subtract(request.valor()));
+        registrarLancamento(conta, TipoLancamento.SAQUE, request.valor());
+
+        return toResponse(conta);
+    }
+
+    @Transactional(readOnly = true)
+    public SaldoResponse consultarSaldo(Long id) {
+        Conta conta = buscarEntidadePorId(id);
+        return new SaldoResponse(conta.getId(), conta.getSaldo());
+    }
+
+    @Transactional(readOnly = true)
+    public List<LancamentoResponse> extrato(Long id) {
+        buscarEntidadePorId(id);
+
+        return lancamentoRepository.findByContaIdOrderByDataHoraDesc(id).stream()
+                .map(l -> new LancamentoResponse(l.getId(), l.getTipo(), l.getValor(), l.getSaldoApos(),
+                        l.getDataHora()))
+                .toList();
+    }
+
+    private void validarContaAtiva(Conta conta) {
+        if (conta.getStatus() != StatusConta.ATIVA) {
+            throw new ContaInativaException(conta.getId());
+        }
+    }
+
+    private void registrarLancamento(Conta conta, TipoLancamento tipo, BigDecimal valor) {
+        Lancamento lancamento = Lancamento.builder()
+                .conta(conta)
+                .tipo(tipo)
+                .valor(valor)
+                .saldoApos(conta.getSaldo())
+                .build();
+
+        lancamentoRepository.save(lancamento);
     }
 
     public ContaResponse encerrar(Long id) {
