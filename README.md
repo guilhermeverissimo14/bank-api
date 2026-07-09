@@ -37,13 +37,7 @@ API REST simples de operações bancárias (cadastro de cliente, autenticação,
    cp .env.example .env
    ```
 
-3. Exporte as variáveis do `.env` no shell antes de rodar a aplicação (o Spring Boot não lê `.env` sozinho — só o Docker Compose lê):
-
-   ```bash
-   export $(grep -v '^#' .env | xargs)
-   ```
-
-4. Rode a aplicação:
+3. Rode a aplicação:
 
    ```bash
    ./mvnw spring-boot:run
