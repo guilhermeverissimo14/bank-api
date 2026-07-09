@@ -3,6 +3,8 @@ package com.aplication.bankapi.controller;
 import com.aplication.bankapi.dto.conta.AbrirContaRequest;
 import com.aplication.bankapi.dto.conta.ContaResponse;
 import com.aplication.bankapi.service.ContaService;
+
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +16,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/contas")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
 public class ContaController {
 
     private final ContaService contaService;

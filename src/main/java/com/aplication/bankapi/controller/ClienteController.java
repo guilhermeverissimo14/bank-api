@@ -4,6 +4,8 @@ import com.aplication.bankapi.dto.cliente.ClienteRequest;
 import com.aplication.bankapi.dto.cliente.ClienteResponse;
 import com.aplication.bankapi.dto.cliente.ClienteUpdateRequest;
 import com.aplication.bankapi.service.ClienteService;
+
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -26,23 +28,27 @@ public class ClienteController {
     }
 
     @GetMapping
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<List<ClienteResponse>> listar(
             @RequestParam(required = false) String nome) {
         return ResponseEntity.ok(clienteService.listar(nome));
     }
 
     @GetMapping("/{id}")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<ClienteResponse> buscarPorId(@PathVariable Long id) {
         return ResponseEntity.ok(clienteService.buscarPorId(id));
     }
 
     @PutMapping("/{id}")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<ClienteResponse> atualizar(@PathVariable Long id,
             @Valid @RequestBody ClienteUpdateRequest request) {
         return ResponseEntity.ok(clienteService.atualizar(id, request));
     }
 
     @DeleteMapping("/{id}")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
         clienteService.deletar(id);
         return ResponseEntity.noContent().build();
