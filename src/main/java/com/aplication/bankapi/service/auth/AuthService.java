@@ -21,13 +21,18 @@ public class AuthService {
         Cliente cliente = clienteRepository.findByEmail(request.email())
                 .orElseThrow(CredenciaisInvalidasException::new);
 
-        if (!passwordEncoder.matches(request.senha(), cliente.getSenha())) { //matches compara a senha fornecida com a criptografada.
+        if (!passwordEncoder.matches(request.senha(), cliente.getSenha())) { // matches compara a senha fornecida com a
+                                                                             // criptografada.
             throw new CredenciaisInvalidasException();
         }
 
         String token = jwtService.gerarToken(cliente.getId(), cliente.getEmail());
 
-        return new LoginResponse(token, jwtService.getExpirationSeconds());
+        return new LoginResponse(
+                cliente.getId(),
+                cliente.getNome(),
+                cliente.getEmail(),
+                token,
+                jwtService.getExpirationSeconds());
     }
 }
-
