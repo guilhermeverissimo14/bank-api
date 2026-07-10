@@ -6,9 +6,12 @@ import com.aplication.bankapi.entity.Cliente;
 import com.aplication.bankapi.exception.CredenciaisInvalidasException;
 import com.aplication.bankapi.repository.ClienteRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -19,10 +22,13 @@ public class AuthService {
 
     public LoginResponse login(LoginRequest request) {
         Cliente cliente = clienteRepository.findByEmail(request.email())
-                .orElseThrow(CredenciaisInvalidasException::new);
+                .orElseThrow(() -> {
+                    log.warn("Tentativa de login com email não cadastrado: {}", request.email());
+                    return new CredenciaisInvalidasException();
+                });
 
-        if (!passwordEncoder.matches(request.senha(), cliente.getSenha())) { // matches compara a senha fornecida com a
-                                                                             // criptografada.
+        if (!passwordEncoder.matches(request.senha(), cliente.getSenha())) { // matches compara a senha fornecida com a criptografada.
+            log.warn("Tentativa de login com credenciais inválidas: email={}", request.email());
             throw new CredenciaisInvalidasException();
         }
 

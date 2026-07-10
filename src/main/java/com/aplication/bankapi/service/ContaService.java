@@ -25,7 +25,9 @@ import com.aplication.bankapi.repository.ContaRepository;
 import com.aplication.bankapi.repository.LancamentoRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -49,7 +51,11 @@ public class ContaService {
                 .cliente(cliente)
                 .build();
 
-        return toResponse(contaRepository.save(conta));
+        Conta salvaConta = contaRepository.save(conta);
+        log.info("Conta aberta: id={}, numero={}, clienteId={}", salvaConta.getId(), salvaConta.getNumero(),
+                cliente.getId());
+
+        return toResponse(salvaConta);
     }
 
     @Transactional(readOnly = true)
@@ -70,7 +76,7 @@ public class ContaService {
 
         conta.setSaldo(conta.getSaldo().add(request.valor()));
         registrarLancamento(conta, TipoLancamento.DEPOSITO, request.valor());
-
+        log.info("Depósito de {} na conta {}. Novo saldo: {}", request.valor(), id, conta.getSaldo());
         return toResponse(conta);
     }
 
@@ -79,12 +85,14 @@ public class ContaService {
         validarContaAtiva(conta);
 
         if (conta.getSaldo().compareTo(request.valor()) < 0) {
+            log.warn("Saque recusado por saldo insuficiente: conta={}, valorSolicitado={}, saldoDisponivel={}",
+                    id, request.valor(), conta.getSaldo());
             throw new SaldoInsuficienteException(id, conta.getSaldo());
         }
 
         conta.setSaldo(conta.getSaldo().subtract(request.valor()));
         registrarLancamento(conta, TipoLancamento.SAQUE, request.valor());
-
+        log.info("Saque de {} na conta {}. Novo saldo: {}", request.valor(), id, conta.getSaldo());
         return toResponse(conta);
     }
 
@@ -104,6 +112,19 @@ public class ContaService {
                 .toList();
     }
 
+    public ContaResponse encerrar(Long id) {
+        Conta conta = buscarEntidadePorId(id);
+
+        if (conta.getSaldo().compareTo(BigDecimal.ZERO) != 0) {
+            log.warn("Encerramento recusado por saldo não zerado: conta={}, saldo={}", id, conta.getSaldo());
+            throw new SaldoNaoZeradoException(id);
+        }
+
+        conta.setStatus(StatusConta.ENCERRADA);
+        log.info("Conta encerrada: id={}", id);
+        return toResponse(conta);
+    }
+
     private void validarContaAtiva(Conta conta) {
         if (conta.getStatus() != StatusConta.ATIVA) {
             throw new ContaInativaException(conta.getId());
@@ -119,18 +140,6 @@ public class ContaService {
                 .build();
 
         lancamentoRepository.save(lancamento);
-    }
-
-    public ContaResponse encerrar(Long id) {
-        Conta conta = buscarEntidadePorId(id);
-
-        if (conta.getSaldo().compareTo(BigDecimal.ZERO) != 0) {
-            throw new SaldoNaoZeradoException(id);
-        }
-
-        conta.setStatus(StatusConta.ENCERRADA);
-
-        return toResponse(conta);
     }
 
     private Conta buscarEntidadePorId(Long id) {

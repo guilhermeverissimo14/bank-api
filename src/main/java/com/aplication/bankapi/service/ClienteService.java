@@ -10,12 +10,14 @@ import com.aplication.bankapi.exception.ResourceNotFoundException;
 import com.aplication.bankapi.repository.ClienteRepository;
 import com.aplication.bankapi.repository.ContaRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -37,7 +39,9 @@ public class ClienteService {
                 .senha(passwordEncoder.encode(request.senha()))
                 .build();
 
-        return toResponse(clienteRepository.save(cliente));
+        Cliente salvaCliente = clienteRepository.save(cliente);
+        log.info("Cliente criado com sucesso: {}", salvaCliente.getId());
+        return toResponse(salvaCliente);
     }
 
     @Transactional(readOnly = true)
@@ -55,6 +59,7 @@ public class ClienteService {
         return toResponse(buscarEntidadePorId(id));
     }
 
+    //dirty checking do JPA, não precisa chamar o save, ele atualiza automaticamente
     public ClienteResponse atualizar(Long id, ClienteUpdateRequest request) {
         Cliente cliente = buscarEntidadePorId(id);
 
@@ -64,7 +69,7 @@ public class ClienteService {
 
         cliente.setNome(request.nome());
         cliente.setEmail(request.email());
-
+        log.info("Cliente atualizado com sucesso: {}", cliente.getId());  
         return toResponse(cliente);
     }
 
@@ -75,6 +80,7 @@ public class ClienteService {
         }
 
         clienteRepository.delete(buscarEntidadePorId(id));
+        log.info("Cliente deletado com sucesso: {}", id);
     }
 
     private Cliente buscarEntidadePorId(Long id) {
