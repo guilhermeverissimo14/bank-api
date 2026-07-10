@@ -2,6 +2,7 @@ package com.aplication.bankapi.controller;
 
 import com.aplication.bankapi.dto.conta.AbrirContaRequest;
 import com.aplication.bankapi.dto.conta.ContaResponse;
+import com.aplication.bankapi.dto.conta.LancamentoResponse;
 import com.aplication.bankapi.dto.conta.SaldoResponse;
 import com.aplication.bankapi.dto.conta.TransacaoRequest;
 import com.aplication.bankapi.dto.conta.ValorRequest;
@@ -25,6 +26,9 @@ import java.net.URI;
 import java.util.List;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 @Tag(name = "Contas", description = "Abertura e movimentação de contas bancárias")
@@ -69,6 +73,12 @@ public class ContaController {
     public ResponseEntity<ContaResponse> buscarPorId(@PathVariable Long id) {
         return ResponseEntity.ok(contaService.buscarPorId(id));
     }
+
+    @GetMapping("/{id}/extrato")
+    public ResponseEntity<List<LancamentoResponse>> extrato(@PathVariable Long id) {
+        return ResponseEntity.ok(contaService.extrato(id));
+    }
+    
 
     @Operation(summary = "Encerrar conta", description = "Encerra a conta, mudando o status para ENCERRADA. Só é permitido com o saldo zerado.")
     @ApiResponses({
