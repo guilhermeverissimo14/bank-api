@@ -15,6 +15,7 @@ import com.aplication.bankapi.exception.EmailJaCadastradoException;
 import com.aplication.bankapi.exception.ResourceNotFoundException;
 import com.aplication.bankapi.exception.SaldoInsuficienteException;
 import com.aplication.bankapi.exception.SaldoNaoZeradoException;
+import com.aplication.bankapi.exception.TransferenciaParaMesmaContaException;
 import com.aplication.bankapi.exception.errors.ErrorResponse;
 import com.aplication.bankapi.exception.errors.ValidationErrorResponse;
 
@@ -24,7 +25,7 @@ import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-@Slf4j //esse é do lombok, ele cria logs automatico
+@Slf4j // esse é do lombok, ele cria logs automatico
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -38,7 +39,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(buildBody(HttpStatus.CONFLICT, ex.getMessage()));
     }
 
-    //Quando bate no @Valid e não passa na validação, cai aqui
+    // Quando bate no @Valid e não passa na validação, cai aqui
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ValidationErrorResponse> handleValidation(MethodArgumentNotValidException ex) {
         Map<String, String> erros = new LinkedHashMap<>();
@@ -51,8 +52,7 @@ public class GlobalExceptionHandler {
                 HttpStatus.BAD_REQUEST.value(),
                 HttpStatus.BAD_REQUEST.getReasonPhrase(),
                 "Erro de validação",
-                erros
-        );
+                erros);
 
         return ResponseEntity.badRequest().body(body);
     }
@@ -82,19 +82,24 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(buildBody(HttpStatus.CONFLICT, ex.getMessage()));
     }
 
-    //nullPointerExeception erro inesperado, cai aqui
-     @ExceptionHandler(Exception.class)
+    // nullPointerExeception erro inesperado, cai aqui
+    @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
         log.error("Erro inesperado", ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(buildBody(HttpStatus.INTERNAL_SERVER_ERROR, "Erro interno do servidor"));
     }
 
-    //Quando o corpo da requisição é inválido ou malformado, cai aqui
+    // Quando o corpo da requisição é inválido ou malformado, cai aqui
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponse> handleMessageNotReadable(HttpMessageNotReadableException ex) {
         return ResponseEntity.badRequest()
                 .body(buildBody(HttpStatus.BAD_REQUEST, "Corpo da requisição inválido ou malformado"));
+    }
+
+    @ExceptionHandler(TransferenciaParaMesmaContaException.class)
+    public ResponseEntity<ErrorResponse> handleTransferenciaParaMesmaConta(TransferenciaParaMesmaContaException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(buildBody(HttpStatus.CONFLICT, ex.getMessage()));
     }
 
     private ErrorResponse buildBody(HttpStatus status, String message) {
