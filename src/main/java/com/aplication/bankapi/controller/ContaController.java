@@ -36,8 +36,8 @@ public class ContaController {
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Conta aberta com sucesso"),
             @ApiResponse(responseCode = "400", description = "Dados inválidos (email ou senha ausentes/mal formatados)", content = @Content(schema = @Schema(implementation = ValidationErrorResponse.class))),
-            @ApiResponse(responseCode = "401", description = "Email ou senha incorretos", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "404", description = "Cliente não encontrado")
+            @ApiResponse(responseCode = "401", description = "Token ausente ou inválido", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Cliente não encontrado", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping
     public ResponseEntity<ContaResponse> abrir(@Valid @RequestBody AbrirContaRequest request) {
@@ -59,7 +59,7 @@ public class ContaController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Conta encontrada"),
             @ApiResponse(responseCode = "401", description = "Token ausente ou inválido", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "404", description = "Conta não encontrada")
+            @ApiResponse(responseCode = "404", description = "Conta não encontrada", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/{id}")
     public ResponseEntity<ContaResponse> buscarPorId(@PathVariable Long id) {
@@ -70,8 +70,8 @@ public class ContaController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Conta encerrada com sucesso"),
             @ApiResponse(responseCode = "401", description = "Token ausente ou inválido", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "404", description = "Conta não encontrada"),
-            @ApiResponse(responseCode = "409", description = "Conta com saldo diferente de zero")
+            @ApiResponse(responseCode = "404", description = "Conta não encontrada", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "409", description = "Conta com saldo diferente de zero", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PatchMapping("/{id}/encerrar")
     public ResponseEntity<ContaResponse> encerrar(@PathVariable Long id) {
@@ -83,8 +83,8 @@ public class ContaController {
             @ApiResponse(responseCode = "200", description = "Depósito realizado com sucesso"),
             @ApiResponse(responseCode = "400", description = "Valor inválido (ausente, zero ou negativo)", content = @Content(schema = @Schema(implementation = ValidationErrorResponse.class))),
             @ApiResponse(responseCode = "401", description = "Token ausente ou inválido", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "404", description = "Conta não encontrada"),
-            @ApiResponse(responseCode = "409", description = "Conta não está ativa")
+            @ApiResponse(responseCode = "404", description = "Conta não encontrada", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "409", description = "Conta não está ativa", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/{id}/depositar")
     public ResponseEntity<ContaResponse> depositar(@PathVariable Long id, @Valid @RequestBody ValorRequest request) {
@@ -94,10 +94,10 @@ public class ContaController {
     @Operation(summary = "Sacar", description = "Saca um valor da conta, validando saldo disponível, atualiza o saldo e registra o lançamento no extrato.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Saque realizado com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Valor inválido (ausente, zero ou negativo)"),
-            @ApiResponse(responseCode = "401", description = "Token ausente ou inválido"),
-            @ApiResponse(responseCode = "404", description = "Conta não encontrada"),
-            @ApiResponse(responseCode = "409", description = "Saldo insuficiente ou conta não está ativa")
+            @ApiResponse(responseCode = "400", description = "Valor inválido (ausente, zero ou negativo)", content = @Content(schema = @Schema(implementation = ValidationErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Token ausente ou inválido", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Conta não encontrada", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "409", description = "Saldo insuficiente ou conta não está ativa", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/{id}/sacar")
     public ResponseEntity<ContaResponse> sacar(@PathVariable Long id, @Valid @RequestBody ValorRequest request) {
@@ -107,8 +107,8 @@ public class ContaController {
     @Operation(summary = "Consultar saldo", description = "Retorna o saldo atual da conta.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Saldo retornado com sucesso"),
-            @ApiResponse(responseCode = "401", description = "Token ausente ou inválido"),
-            @ApiResponse(responseCode = "404", description = "Conta não encontrada")
+            @ApiResponse(responseCode = "401", description = "Token ausente ou inválido", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Conta não encontrada", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/{id}/saldo")
     public ResponseEntity<SaldoResponse> consultarSaldo(@PathVariable Long id) {

@@ -32,7 +32,8 @@ public class ClienteController {
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Cliente criado com sucesso"),
             @ApiResponse(responseCode = "400", description = "Dados inválidos (nome/email/senha ausentes ou mal formatados)", content = @Content(schema = @Schema(implementation = ValidationErrorResponse.class))),
-            @ApiResponse(responseCode = "409", description = "Já existe um cliente cadastrado com esse email")
+            @ApiResponse(responseCode = "401", description = "Token ausente ou inválido", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "409", description = "Já existe um cliente cadastrado com esse email", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping
     public ResponseEntity<ClienteResponse> criar(@Valid @RequestBody ClienteRequest request) {
@@ -43,7 +44,7 @@ public class ClienteController {
     @Operation(summary = "Listar clientes", description = "Lista todos os clientes cadastrados. Aceita um filtro opcional por nome (busca parcial, sem diferenciar maiúsculas/minúsculas).")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Lista retornada com sucesso"),
-            @ApiResponse(responseCode = "401", description = "Email ou senha incorretos", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+            @ApiResponse(responseCode = "401", description = "Token ausente ou inválido", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping
     @SecurityRequirement(name = "bearerAuth")
@@ -55,8 +56,8 @@ public class ClienteController {
     @Operation(summary = "Buscar cliente por id", description = "Retorna os dados de um cliente específico.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Cliente encontrado"),
-            @ApiResponse(responseCode = "401", description = "Email ou senha incorretos", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "404", description = "Cliente não encontrado")
+            @ApiResponse(responseCode = "401", description = "Token ausente ou inválido", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Cliente não encontrado", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/{id}")
     @SecurityRequirement(name = "bearerAuth")
@@ -68,9 +69,9 @@ public class ClienteController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Cliente atualizado com sucesso"),
             @ApiResponse(responseCode = "400", description = "Dados inválidos (email ou senha ausentes/mal formatados)", content = @Content(schema = @Schema(implementation = ValidationErrorResponse.class))),
-            @ApiResponse(responseCode = "401", description = "Email ou senha incorretos", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "404", description = "Cliente não encontrado"),
-            @ApiResponse(responseCode = "409", description = "Já existe outro cliente cadastrado com esse email")
+            @ApiResponse(responseCode = "401", description = "Token ausente ou inválido", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Cliente não encontrado", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "409", description = "Já existe outro cliente cadastrado com esse email", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PutMapping("/{id}")
     @SecurityRequirement(name = "bearerAuth")
@@ -82,9 +83,9 @@ public class ClienteController {
     @Operation(summary = "Excluir cliente", description = "Remove um cliente. A exclusão é bloqueada se o cliente tiver alguma conta vinculada.")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Cliente excluído com sucesso"),
-           @ApiResponse(responseCode = "401", description = "Email ou senha incorretos", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "404", description = "Cliente não encontrado"),
-            @ApiResponse(responseCode = "409", description = "Cliente possui conta(s) vinculada(s) e não pode ser excluído")
+           @ApiResponse(responseCode = "401", description = "Token ausente ou inválido", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Cliente não encontrado", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "409", description = "Cliente possui conta(s) vinculada(s) e não pode ser excluído", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @DeleteMapping("/{id}")
     @SecurityRequirement(name = "bearerAuth")
