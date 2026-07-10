@@ -91,6 +91,11 @@ Rotas públicas (sem autenticação): `POST /clientes`, `POST /auth/login` e o S
 | POST | `/contas` | Abre uma conta para um cliente existente | Sim |
 | GET | `/contas` | Lista todas as contas | Sim |
 | GET | `/contas/{id}` | Busca conta por id | Sim |
+| POST | `/contas/{id}/depositar` | Deposita um valor na conta | Sim |
+| POST | `/contas/{id}/sacar` | Saca um valor da conta (valida saldo disponível) | Sim |
+| GET | `/contas/{id}/saldo` | Consulta o saldo atual da conta | Sim |
+| GET | `/contas/{id}/extrato` | Lista os lançamentos da conta (mais recente primeiro) | Sim |
+| POST | `/contas/{id}/transferir` | Transfere um valor para outra conta (identificada por número + agência) | Sim |
 | PATCH | `/contas/{id}/encerrar` | Encerra a conta (só com saldo zerado) | Sim |
 
 
@@ -98,14 +103,16 @@ Rotas públicas (sem autenticação): `POST /clientes`, `POST /auth/login` e o S
 
 ```
 src/main/java/com/aplication/bankapi
- ├─ entity/       # Entidades JPA (Cliente, Conta, Lancamento)
- ├─ enums/        # Enums de domínio (StatusConta, TipoLancamento)
- ├─ dto/          # Records de request/response, organizados por feature
- ├─ repository/   # Interfaces Spring Data JPA
- ├─ service/      # Regras de negócio
- ├─ controller/   # Endpoints REST
- ├─ exception/    # Exceptions de negócio + handler global (@RestControllerAdvice)
- └─ config/       # Configuração de segurança (JWT, PasswordEncoder)
+ ├─ entity/          # Entidades JPA (Cliente, Conta, Lancamento)
+ ├─ enums/           # Enums de domínio (StatusConta, TipoLancamento)
+ ├─ dto/             # Records de request/response, organizados por feature
+ ├─ repository/      # Interfaces Spring Data JPA
+ ├─ service/         # Regras de negócio
+ ├─ controller/      # Endpoints REST
+ ├─ exception/       # Exceptions de negócio
+ │   ├─ errors/      # ErrorResponse / ValidationErrorResponse (schemas de erro)
+ │   └─ handler/     # GlobalExceptionHandler (@RestControllerAdvice)
+ └─ config/          # Segurança (JWT, PasswordEncoder) e OpenAPI/Swagger
 ```
 
 ## Banco de dados
