@@ -10,6 +10,7 @@ import com.aplication.bankapi.dto.conta.AbrirContaRequest;
 import com.aplication.bankapi.dto.conta.ContaResponse;
 import com.aplication.bankapi.dto.conta.LancamentoResponse;
 import com.aplication.bankapi.dto.conta.SaldoResponse;
+import com.aplication.bankapi.dto.conta.TransacaoRequest;
 import com.aplication.bankapi.dto.conta.ValorRequest;
 import com.aplication.bankapi.entity.Cliente;
 import com.aplication.bankapi.entity.Conta;
@@ -20,6 +21,7 @@ import com.aplication.bankapi.exception.ContaInativaException;
 import com.aplication.bankapi.exception.ResourceNotFoundException;
 import com.aplication.bankapi.exception.SaldoInsuficienteException;
 import com.aplication.bankapi.exception.SaldoNaoZeradoException;
+import com.aplication.bankapi.exception.TransferenciaParaMesmaContaException;
 import com.aplication.bankapi.repository.ClienteRepository;
 import com.aplication.bankapi.repository.ContaRepository;
 import com.aplication.bankapi.repository.LancamentoRepository;
@@ -84,15 +86,44 @@ public class ContaService {
         Conta conta = buscarEntidadePorId(id);
         validarContaAtiva(conta);
 
-        if (conta.getSaldo().compareTo(request.valor()) < 0) {
-            log.warn("Saque recusado por saldo insuficiente: conta={}, valorSolicitado={}, saldoDisponivel={}",
-                    id, request.valor(), conta.getSaldo());
-            throw new SaldoInsuficienteException(id, conta.getSaldo());
-        }
+        validarSaldoSuficiente(conta, request.valor(), "Saque");
 
         conta.setSaldo(conta.getSaldo().subtract(request.valor()));
         registrarLancamento(conta, TipoLancamento.SAQUE, request.valor());
         log.info("Saque de {} na conta {}. Novo saldo: {}", request.valor(), id, conta.getSaldo());
+        return toResponse(conta);
+    }
+
+    public ContaResponse transferir(Long id, TransacaoRequest request) {
+        Conta conta = buscarEntidadePorId(id);
+        validarContaAtiva(conta);
+
+        validarSaldoSuficiente(conta, request.valor(), "Transferência");
+
+        Conta contaDestino = contaRepository.findByNumeroAndAgencia(request.numeroConta(), request.agencia())
+                .orElseThrow(() -> {
+                    log.warn("Conta destino não encontrada com número: {} e agência: {}", request.numeroConta(), request.agencia());
+                    return new ResourceNotFoundException(
+                            "Conta destino não encontrada com número: " + request.numeroConta() + " e agência: "
+                                    + request.agencia());
+                });
+
+        if (contaDestino.getId().equals(conta.getId())) {
+            throw new TransferenciaParaMesmaContaException(id);
+        }
+
+        validarContaAtiva(contaDestino);
+
+        conta.setSaldo(conta.getSaldo().subtract(request.valor()));
+        registrarLancamento(conta, TipoLancamento.TRANSFERENCIA_ENVIADA, request.valor());
+
+        contaDestino.setSaldo(contaDestino.getSaldo().add(request.valor()));
+        registrarLancamento(contaDestino, TipoLancamento.TRANSFERENCIA_RECEBIDA, request.valor());
+
+        log.info(
+                "Transferência de {} da conta {} para a conta {}. Novo saldo da conta origem: {}, novo saldo da conta destino: {}",
+                request.valor(), id, contaDestino.getId(), conta.getSaldo(), contaDestino.getSaldo());
+
         return toResponse(conta);
     }
 
@@ -125,8 +156,17 @@ public class ContaService {
         return toResponse(conta);
     }
 
+    private void validarSaldoSuficiente(Conta conta, BigDecimal valor, String nomeOperacao) {
+        if (conta.getSaldo().compareTo(valor) < 0) {
+            log.warn("{} recusado por saldo insuficiente: conta={}, valorSolicitado={}, saldoDisponivel={}",
+                    nomeOperacao, conta.getId(), valor, conta.getSaldo());
+            throw new SaldoInsuficienteException(conta.getId(), conta.getSaldo());
+        }
+    }
+
     private void validarContaAtiva(Conta conta) {
         if (conta.getStatus() != StatusConta.ATIVA) {
+            log.warn("Operação recusada, conta inativa: id={}, status={}", conta.getId(), conta.getStatus());
             throw new ContaInativaException(conta.getId());
         }
     }

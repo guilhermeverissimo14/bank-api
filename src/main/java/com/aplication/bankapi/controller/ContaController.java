@@ -3,6 +3,7 @@ package com.aplication.bankapi.controller;
 import com.aplication.bankapi.dto.conta.AbrirContaRequest;
 import com.aplication.bankapi.dto.conta.ContaResponse;
 import com.aplication.bankapi.dto.conta.SaldoResponse;
+import com.aplication.bankapi.dto.conta.TransacaoRequest;
 import com.aplication.bankapi.dto.conta.ValorRequest;
 import com.aplication.bankapi.exception.errors.ErrorResponse;
 import com.aplication.bankapi.exception.errors.ValidationErrorResponse;
@@ -22,6 +23,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 @Tag(name = "Contas", description = "Abertura e movimentação de contas bancárias")
 @RestController
@@ -102,6 +106,19 @@ public class ContaController {
     @PostMapping("/{id}/sacar")
     public ResponseEntity<ContaResponse> sacar(@PathVariable Long id, @Valid @RequestBody ValorRequest request) {
         return ResponseEntity.ok(contaService.sacar(id, request));
+    }
+
+    @Operation(summary = "Transferir", description = "Transfere um valor da conta para outra, validando saldo disponível, atualiza os saldos e registra os lançamentos no extrato.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Transferência realizada com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Valor inválido (ausente, zero ou negativo) ou dados da conta destino inválidos", content = @Content(schema = @Schema(implementation = ValidationErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Token ausente ou inválido", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Conta origem ou destino não encontrada", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "409", description = "Saldo insuficiente, conta não está ativa ou tentativa de transferência para a mesma conta", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PostMapping("/{id}/transferir")
+    public ResponseEntity<ContaResponse> transferir(@PathVariable Long id, @Valid @RequestBody TransacaoRequest request) {
+        return ResponseEntity.ok(contaService.transferir(id, request));
     }
 
     @Operation(summary = "Consultar saldo", description = "Retorna o saldo atual da conta.")
