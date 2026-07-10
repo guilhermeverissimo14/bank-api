@@ -18,10 +18,13 @@ import com.aplication.bankapi.exception.SaldoNaoZeradoException;
 import com.aplication.bankapi.exception.errors.ErrorResponse;
 import com.aplication.bankapi.exception.errors.ValidationErrorResponse;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+@Slf4j //esse é do lombok, ele cria logs automatico
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -77,6 +80,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ContaInativaException.class)
     public ResponseEntity<ErrorResponse> handleContaInativa(ContaInativaException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(buildBody(HttpStatus.CONFLICT, ex.getMessage()));
+    }
+
+    //nullPointerExeception erro inesperado, cai aqui
+     @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
+        log.error("Erro inesperado", ex);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(buildBody(HttpStatus.INTERNAL_SERVER_ERROR, "Erro interno do servidor"));
     }
 
     //Quando o corpo da requisição é inválido ou malformado, cai aqui
