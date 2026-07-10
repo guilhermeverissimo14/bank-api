@@ -74,6 +74,12 @@ public class ContaController {
         return ResponseEntity.ok(contaService.buscarPorId(id));
     }
 
+    @Operation(summary = "Consultar extrato", description = "Retorna o extrato da conta, com todos os lançamentos ordenados do mais recente para o mais antigo.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Extrato retornado com sucesso"),
+            @ApiResponse(responseCode = "401", description = "Token ausente ou inválido", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Conta não encontrada", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @GetMapping("/{id}/extrato")
     public ResponseEntity<List<LancamentoResponse>> extrato(@PathVariable Long id) {
         return ResponseEntity.ok(contaService.extrato(id));
