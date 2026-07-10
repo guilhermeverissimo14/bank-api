@@ -4,8 +4,8 @@ import com.aplication.bankapi.dto.conta.AbrirContaRequest;
 import com.aplication.bankapi.dto.conta.ContaResponse;
 import com.aplication.bankapi.dto.conta.SaldoResponse;
 import com.aplication.bankapi.dto.conta.ValorRequest;
-import com.aplication.bankapi.exception.ErrorResponse;
-import com.aplication.bankapi.exception.ValidationErrorResponse;
+import com.aplication.bankapi.exception.errors.ErrorResponse;
+import com.aplication.bankapi.exception.errors.ValidationErrorResponse;
 import com.aplication.bankapi.service.ContaService;
 
 import io.swagger.v3.oas.annotations.Operation;

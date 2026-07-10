@@ -3,8 +3,8 @@ package com.aplication.bankapi.controller;
 import com.aplication.bankapi.dto.cliente.ClienteRequest;
 import com.aplication.bankapi.dto.cliente.ClienteResponse;
 import com.aplication.bankapi.dto.cliente.ClienteUpdateRequest;
-import com.aplication.bankapi.exception.ErrorResponse;
-import com.aplication.bankapi.exception.ValidationErrorResponse;
+import com.aplication.bankapi.exception.errors.ErrorResponse;
+import com.aplication.bankapi.exception.errors.ValidationErrorResponse;
 import com.aplication.bankapi.service.ClienteService;
 
 import io.swagger.v3.oas.annotations.Operation;

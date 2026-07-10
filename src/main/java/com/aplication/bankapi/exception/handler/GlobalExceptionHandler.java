@@ -12,11 +12,11 @@ import com.aplication.bankapi.exception.ClienteComContaVinculadaException;
 import com.aplication.bankapi.exception.ContaInativaException;
 import com.aplication.bankapi.exception.CredenciaisInvalidasException;
 import com.aplication.bankapi.exception.EmailJaCadastradoException;
-import com.aplication.bankapi.exception.ErrorResponse;
 import com.aplication.bankapi.exception.ResourceNotFoundException;
 import com.aplication.bankapi.exception.SaldoInsuficienteException;
 import com.aplication.bankapi.exception.SaldoNaoZeradoException;
-import com.aplication.bankapi.exception.ValidationErrorResponse;
+import com.aplication.bankapi.exception.errors.ErrorResponse;
+import com.aplication.bankapi.exception.errors.ValidationErrorResponse;
 
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;

@@ -2,8 +2,8 @@ package com.aplication.bankapi.controller;
 
 import com.aplication.bankapi.dto.auth.LoginRequest;
 import com.aplication.bankapi.dto.auth.LoginResponse;
-import com.aplication.bankapi.exception.ErrorResponse;
-import com.aplication.bankapi.exception.ValidationErrorResponse;
+import com.aplication.bankapi.exception.errors.ErrorResponse;
+import com.aplication.bankapi.exception.errors.ValidationErrorResponse;
 import com.aplication.bankapi.service.auth.AuthService;
 
 import io.swagger.v3.oas.annotations.Operation;
