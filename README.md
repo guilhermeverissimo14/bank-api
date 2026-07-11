@@ -57,7 +57,7 @@ Com a aplicação rodando:
 A maior parte das rotas exige um token JWT. Fluxo:
 
 1. Cadastre um cliente: `POST /clientes` (rota pública).
-2. Faça login: `POST /auth/login` (rota pública) — retorna um token.
+2. Faça login: `POST /auth/login` (rota pública) retorna um token.
 3. Envie o token nas demais requisições, no header:
 
    ```
@@ -117,7 +117,7 @@ src/main/java/com/aplication/bankapi
 
 ## Banco de dados
 
-O schema é criado/atualizado automaticamente pelo Hibernate (`spring.jpa.hibernate.ddl-auto=update`) a partir das entidades — não há scripts de migration manuais. Se o schema ficar inconsistente durante o desenvolvimento (ex: renomear coluna), a forma mais simples de resetar é:
+O schema é criado/atualizado automaticamente pelo Hibernate (`spring.jpa.hibernate.ddl-auto=update`) a partir das entidades não há scripts de migration manuais. Se o schema ficar inconsistente durante o desenvolvimento (ex: renomear coluna), a forma mais simples de resetar é:
 
 ```bash
 docker compose down -v
