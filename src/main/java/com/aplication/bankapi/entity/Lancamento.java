@@ -28,7 +28,7 @@ public class Lancamento {
     @JoinColumn(name = "conta_id", nullable = false)
     private Conta conta;
 
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING) 
     @Column(nullable = false, length = 30)
     private TipoLancamento tipo;
 

@@ -34,7 +34,7 @@ public class Cliente {
     @Column(name = "senha", nullable = false)
     private String senha;
 
-     @CreationTimestamp
+    @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
