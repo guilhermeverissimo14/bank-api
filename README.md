@@ -1,6 +1,6 @@
 # Bank API
 
-API REST simples de operações bancárias (cadastro de cliente, autenticação, abertura e movimentação de conta), feita em Spring Boot 3 / Java 21, com PostgreSQL rodando em Docker.
+API REST simples de operações bancárias (cadastro de cliente, autenticação, abertura de conta e movimentações como depósito, saque e transferência), feita em Spring Boot 3 / Java 21, com PostgreSQL rodando em Docker.
 
 ## Stack
 
