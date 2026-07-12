@@ -99,7 +99,7 @@ class ContaServiceTest {
 
         ContaResponse response = contaService.sacar(1L, new ValorRequest(new BigDecimal("40.00")));
 
-        assertThat(response.saldo()).isEqualByComparingTo(new BigDecimal("70.00"));
+        assertThat(response.saldo()).isEqualByComparingTo(new BigDecimal("60.00"));
     }
 
     @Test
