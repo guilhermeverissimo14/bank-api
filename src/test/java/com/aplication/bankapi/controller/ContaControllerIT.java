@@ -1,6 +1,7 @@
 package com.aplication.bankapi.controller;
 
 import com.aplication.bankapi.dto.conta.AbrirContaRequest;
+import com.aplication.bankapi.dto.conta.TransacaoRequest;
 import com.aplication.bankapi.dto.conta.ValorRequest;
 import com.aplication.bankapi.entity.Cliente;
 import com.aplication.bankapi.entity.Conta;
@@ -95,11 +96,11 @@ class ContaControllerIT {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(new ValorRequest(new BigDecimal("100.00")))))
                                 .andExpect(status().isOk())
-                                .andExpect(jsonPath("$.saldo").value(100.00));
+                                .andExpect(jsonPath("$.saldo").value(150.00));
 
                 mockMvc.perform(get("/contas/{id}/saldo", conta.getId()).with(jwt()))
                                 .andExpect(status().isOk())
-                                .andExpect(jsonPath("$.saldo").value(100.00));
+                                .andExpect(jsonPath("$.saldo").value(150.00));
         }
 
         @Test
@@ -126,6 +127,50 @@ class ContaControllerIT {
                                 .andExpect(jsonPath("$.saldo").value(150.00));
 
                 mockMvc.perform(get("/contas/{id}/saldo", conta.getId()).with(jwt()))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.saldo").value(150.00));
+        }
+
+        @Test
+        void deveTransferirEntreContas() throws Exception {
+                Cliente clienteOrigem = clienteRepository.save(Cliente.builder()
+                                .nome("Carlos")
+                                .email("carlos@teste.com")
+                                .senha(passwordEncoder.encode("senha123"))
+                                .build());
+
+                Conta contaOrigem = contaRepository.save(Conta.builder()
+                                .numero("777777")
+                                .agencia("0001")
+                                .saldo(new BigDecimal("300.00"))
+                                .status(StatusConta.ATIVA)
+                                .cliente(clienteOrigem)
+                                .build());
+
+                Cliente clienteDestino = clienteRepository.save(Cliente.builder()
+                                .nome("Beatriz")
+                                .email("beatriz@teste.com")
+                                .senha(passwordEncoder.encode("senha123"))
+                                .build());
+
+                Conta contaDestino = contaRepository.save(Conta.builder()
+                                .numero("888888")
+                                .agencia("0001")
+                                .saldo(new BigDecimal("50.00"))
+                                .status(StatusConta.ATIVA)
+                                .cliente(clienteDestino)
+                                .build());
+
+                TransacaoRequest request = new TransacaoRequest("888888", "0001", new BigDecimal("100.00"));
+
+                mockMvc.perform(post("/contas/{id}/transferir", contaOrigem.getId())
+                                .with(jwt())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.saldo").value(200.00));
+
+                mockMvc.perform(get("/contas/{id}/saldo", contaDestino.getId()).with(jwt()))
                                 .andExpect(status().isOk())
                                 .andExpect(jsonPath("$.saldo").value(150.00));
         }
