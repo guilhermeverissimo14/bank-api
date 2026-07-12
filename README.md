@@ -115,6 +115,18 @@ src/main/java/com/aplication/bankapi
  └─ config/          # Segurança (JWT, PasswordEncoder) e OpenAPI/Swagger
 ```
 
+## Testes
+
+- Testes unitários (`*Test.java`, Mockito sem banco, sem contexto Spring): `./mvnw test`
+- Testes de integração (`*IT.java`, `@SpringBootTest` + Testcontainers — sobe um Postgres real em Docker): `./mvnw verify`
+
+## CI/CD
+
+Pipeline no GitHub Actions (`.github/workflows/ci-cd.yml`):
+
+- **CI**: a cada push ou pull request na `main`, builda a aplicação e roda todos os testes (unitários + integração).
+- **CD**: a cada push na `main`, se os testes passarem, builda a imagem a partir do `Dockerfile` e publica ela no GitHub Container Registry (GHCR).
+
 ## Banco de dados
 
 O schema é criado/atualizado automaticamente pelo Hibernate (`spring.jpa.hibernate.ddl-auto=update`) a partir das entidades não há scripts de migration manuais. Se o schema ficar inconsistente durante o desenvolvimento (ex: renomear coluna), a forma mais simples de resetar é:
