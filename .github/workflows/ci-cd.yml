@@ -40,6 +40,10 @@ jobs:
     # Só publica em push direto na main, não em todo pull request
     # (senão geraria imagem nova a cada PR aberto, sem necessidade)
     if: github.ref == 'refs/heads/main'
+    
+    permissions:
+      contents: read
+      packages: write
 
     steps:
       - name: Checkout do código
