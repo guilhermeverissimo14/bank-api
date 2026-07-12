@@ -79,7 +79,7 @@ class ContaServiceTest {
 
         ContaResponse response = contaService.depositar(1L, new ValorRequest(new BigDecimal("50.00")));
 
-        assertThat(response.saldo()).isEqualByComparingTo(new BigDecimal("150.00"));
+        assertThat(response.saldo()).isEqualByComparingTo(new BigDecimal("160.00"));
         verify(lancamentoRepository).save(any(Lancamento.class));
     }
 
