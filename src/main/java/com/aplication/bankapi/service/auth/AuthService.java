@@ -27,7 +27,7 @@ public class AuthService {
                     return new CredenciaisInvalidasException();
                 });
 
-        if (!passwordEncoder.matches(request.senha(), cliente.getSenha())) { // matches compara a senha fornecida com a criptografada.
+        if (!passwordEncoder.matches(request.senha(), cliente.getSenha())) { // matches compara
             log.warn("Tentativa de login com credenciais inválidas: email={}", request.email());
             throw new CredenciaisInvalidasException();
         }
