@@ -10,9 +10,15 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "conta", uniqueConstraints = {
+@Table(name = "conta", 
+    uniqueConstraints = {
         @UniqueConstraint(name = "uk_conta_numero", columnNames = "numero")
-})
+},
+    indexes = {
+        @Index(name = "idx_conta_id_cliente", columnList = "id_cliente")
+    }
+)
+
 @Getter
 @Setter
 @NoArgsConstructor

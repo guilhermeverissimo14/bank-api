@@ -12,9 +12,6 @@ import lombok.*;
 @Table(name = "cliente",
     uniqueConstraints = {
             @UniqueConstraint(name = "uk_cliente_email", columnNames = "email")
-    }, 
-    indexes = {
-            @Index(name = "idx_conta_id_cliente", columnList = "id_cliente")
     })
 @Getter
 @Setter
