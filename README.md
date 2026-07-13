@@ -76,7 +76,7 @@ Rotas públicas (sem autenticação): `POST /clientes`, `POST /auth/login` e o S
 | GET | `/clientes?nome=` | Lista clientes (filtro opcional por nome) | Sim |
 | GET | `/clientes/{id}` | Busca cliente por id | Sim |
 | PUT | `/clientes/{id}` | Atualiza nome/email do cliente | Sim |
-| DELETE | `/clientes/{id}` | Remove cliente (bloqueado se houver conta vinculada) | Sim |
+| DELETE | `/clientes/{id}` | Remove cliente (bloqueado se houver conta vinculada que não esteja encerrada) | Sim |
 
 ### Autenticação
 
