@@ -8,5 +8,7 @@ import java.util.List;
 public interface LancamentoRepository extends JpaRepository<Lancamento, Long> {
 
     List<Lancamento> findByContaIdOrderByDataHoraDesc(Long contaId);
+    void deleteByContaId(Long contaId);
+
 }
 

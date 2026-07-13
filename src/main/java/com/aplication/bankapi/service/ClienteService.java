@@ -4,11 +4,15 @@ import com.aplication.bankapi.dto.cliente.ClienteRequest;
 import com.aplication.bankapi.dto.cliente.ClienteResponse;
 import com.aplication.bankapi.dto.cliente.ClienteUpdateRequest;
 import com.aplication.bankapi.entity.Cliente;
+import com.aplication.bankapi.entity.Conta;
+import com.aplication.bankapi.enums.StatusConta;
 import com.aplication.bankapi.exception.ClienteComContaVinculadaException;
 import com.aplication.bankapi.exception.EmailJaCadastradoException;
 import com.aplication.bankapi.exception.ResourceNotFoundException;
 import com.aplication.bankapi.repository.ClienteRepository;
 import com.aplication.bankapi.repository.ContaRepository;
+import com.aplication.bankapi.repository.LancamentoRepository;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -17,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -26,7 +31,7 @@ public class ClienteService {
     private final ContaRepository contaRepository;
     private final ClienteRepository clienteRepository;
     private final PasswordEncoder passwordEncoder;
-
+    private final LancamentoRepository lancamentoRepository;
 
     public ClienteResponse criar(ClienteRequest request) {
         if (clienteRepository.existsByEmail(request.email())) {
@@ -47,8 +52,9 @@ public class ClienteService {
     @Transactional(readOnly = true)
     public List<ClienteResponse> listar(String nome) {
 
-        List<Cliente> clientes = (nome == null || nome.isEmpty()) ? clienteRepository.findAll() : clienteRepository.findByNome(nome);
-        
+        List<Cliente> clientes = (nome == null || nome.isEmpty()) ? clienteRepository.findAll()
+                : clienteRepository.findByNome(nome);
+
         return clientes.stream()
                 .map(this::toResponse)
                 .toList();
@@ -59,7 +65,8 @@ public class ClienteService {
         return toResponse(buscarEntidadePorId(id));
     }
 
-    //dirty checking do JPA, não precisa chamar o save, ele atualiza automaticamente
+    // dirty checking do JPA, não precisa chamar o save, ele atualiza
+    // automaticamente
     public ClienteResponse atualizar(Long id, ClienteUpdateRequest request) {
         Cliente cliente = buscarEntidadePorId(id);
 
@@ -69,18 +76,28 @@ public class ClienteService {
 
         cliente.setNome(request.nome());
         cliente.setEmail(request.email());
-        log.info("Cliente atualizado com sucesso: {}", cliente.getId());  
+        log.info("Cliente atualizado com sucesso: {}", cliente.getId());
         return toResponse(cliente);
     }
 
     public void deletar(Long id) {
+        Cliente cliente = buscarEntidadePorId(id);
+        List<Conta> contas = contaRepository.findByClienteId(id);
 
-        if(contaRepository.existsByClienteId(id)) {
+        boolean existeContaNaoEncerrada = contas.stream()
+                .anyMatch(conta -> conta.getStatus() != StatusConta.ENCERRADA);
+
+        if (existeContaNaoEncerrada) {
             throw new ClienteComContaVinculadaException(id);
         }
 
-        clienteRepository.delete(buscarEntidadePorId(id));
-        log.info("Cliente deletado com sucesso: {}", id);
+        for (Conta conta : contas) {
+            lancamentoRepository.deleteByContaId(conta.getId());
+            contaRepository.delete(conta);
+        }
+
+        clienteRepository.delete(cliente);
+        log.info("Cliente removido: id={}, contas encerradas removidas junto: {}", id, contas.size());
     }
 
     private Cliente buscarEntidadePorId(Long id) {
@@ -92,4 +109,3 @@ public class ClienteService {
         return new ClienteResponse(cliente.getId(), cliente.getNome(), cliente.getEmail(), cliente.getCreatedAt());
     }
 }
-

@@ -80,7 +80,7 @@ public class ClienteController {
         return ResponseEntity.ok(clienteService.atualizar(id, request));
     }
 
-    @Operation(summary = "Excluir cliente", description = "Remove um cliente. A exclusão é bloqueada se o cliente tiver alguma conta vinculada.")
+    @Operation(summary = "Excluir cliente", description = "Remove um cliente. A exclusão é bloqueada se o cliente tiver alguma conta vinculada que não esteja encerrada.")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Cliente excluído com sucesso"),
            @ApiResponse(responseCode = "401", description = "Token ausente ou inválido", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
