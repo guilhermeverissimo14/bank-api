@@ -53,7 +53,7 @@ public class ClienteService {
     public List<ClienteResponse> listar(String nome) {
 
         List<Cliente> clientes = (nome == null || nome.isEmpty()) ? clienteRepository.findAll()
-                : clienteRepository.findByNome(nome);
+                : clienteRepository.findByNomeContainingIgnoreCase(nome);
 
         return clientes.stream()
                 .map(this::toResponse)
