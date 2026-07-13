@@ -9,9 +9,13 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "cliente", uniqueConstraints = {
-        @UniqueConstraint(name = "uk_cliente_email", columnNames = "email")
-})
+@Table(name = "cliente",
+    uniqueConstraints = {
+            @UniqueConstraint(name = "uk_cliente_email", columnNames = "email")
+    }, 
+    indexes = {
+            @Index(name = "idx_conta_id_cliente", columnList = "id_cliente")
+    })
 @Getter
 @Setter
 @NoArgsConstructor
@@ -21,8 +25,8 @@ import lombok.*;
 public class Cliente {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) 
-    @EqualsAndHashCode.Include 
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(name = "nome", nullable = false, length = 120)
